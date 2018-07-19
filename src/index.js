@@ -3,7 +3,8 @@ let { getRequest, makeRequest, base64Encode } = require('./request');
 let { getItem,
     getItemByLegacyId,
     getItemByItemGroup,
-    searchItems } = require('./buy-api');
+    searchItems,
+    searchItemsById } = require('./buy-api');
 let urlObject = require('./buildURL');
 
 function Ebay(options) {
@@ -30,6 +31,23 @@ Ebay.prototype = {
         return getRequest(url).then((data) => {
             let result = JSON.parse(data);
             return result["findItemsByKeywordsResponse"];
+
+        }, (error) => {
+            console.log(error);
+        })
+
+    },
+    findItemsById: function (id) {
+        // console.log("keyword" + keyword);
+        if (!id) throw new Error("Keyword is missing, Keyword is required");
+        this.options.name = id;
+        this.options.operationName = "findItemsByProduct";
+        this.options.param = "id";
+        let url = urlObject.buildSearchUrl(this.options);
+        console.log(url);
+        return getRequest(url).then((data) => {
+            let result = JSON.parse(data);
+            return result["findItemsByIdResponse"];
 
         }, (error) => {
             console.log(error);
@@ -118,7 +136,8 @@ Ebay.prototype = {
     getItem,
     getItemByLegacyId,
     getItemByItemGroup,
-    searchItems
+    searchItems,
+    searchItemsById
 };
 
 module.exports = Ebay;
